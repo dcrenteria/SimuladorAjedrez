@@ -23,7 +23,12 @@
 <div id="fen"></div>
 <label>PGN:</label>
 <div id="pgn"></div>
-<div id="Audio"></div>
+<div id="Audio">
+<audio controls preload="auto" id="audioMove"><source src="sound/dropPiece.mp3" type="audio/mpeg"></audio>
+<audio controls preload="none" id="audioCheck"><source src="sound/check.mp3" type="audio/mpeg"></audio>
+<audio controls preload="none" id="audioCapture"><source src="sound/capturePiece.mp3" type="audio/mpeg"></audio>
+<audio controls preload="none" id="audioCastling"><source src="sound/castling.mp3" type="audio/mpeg"></audio>
+</div>
 <!--- End Example HTML -------------------------------------------------------->
 
 <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
@@ -68,6 +73,14 @@ function onDragStart (source, piece) {
   }
 }
 
+var last =  function(array, n) {
+  if (array == null) 
+    return void 0;
+  if (n == null) 
+     return array[array.length - 1];
+  return array.slice(Math.max(array.length - n, 0));  
+  };
+
 function onDrop (source, target) {
   removeGreySquares()
 
@@ -81,28 +94,33 @@ function onDrop (source, target) {
   // illegal move
   if (move === null) return 'snapback'
 
-  updateStatus()
-
-  
-  $("#Audio").append("<audio controls autoplay><source src=\"sound/dropPiece.mp3\" type=\"audio/mpeg\">Your browser does not support the audio element.</audio>");
+  updateStatus()    
 }
 
 function updateStatus () {
+  var audioCheck= document.getElementById("audioCheck");
+  var audioMove=document.getElementById("audioMove");
+  var audioCapture=document.getElementById("audioCapture");
+  var audioCastling=document.getElementById("audioCastling");
   var status = ''
 
   var moveColor = 'White'
+  board.orientation('white')
   if (game.turn() === 'b') {
+    //board.orientation('black') --> Flip de board
     moveColor = 'Black'
   }
 
   // checkmate?
   if (game.in_checkmate()) {
     status = 'Game over, ' + moveColor + ' is in checkmate.'
+    audioCheck.play();
   }
 
   // draw?
   else if (game.in_draw()) {
     status = 'Game over, drawn position'
+    audioMove.play();
   }
 
   // game still on
@@ -112,6 +130,63 @@ function updateStatus () {
     // check?
     if (game.in_check()) {
       status += ', ' + moveColor + ' is in check'
+      audioCheck.play();
+    }
+    else
+    {
+      var newPgn= last(game.pgn(),4)
+      console.log(newPgn)
+      if(isNaN(newPgn[0]) )
+      {
+        if(newPgn[0] == '.' || newPgn[0] == 'O')
+        {
+          audioMove.play();
+          console.log("*Es un peon")
+        }
+        else
+        {
+          if(newPgn[0] == '-')
+          {
+            audioCastling.play(); 
+            console.log("Enroque largo");                
+          }
+          else
+          {
+            if(newPgn[1]=='x')
+            {
+              audioCapture.play();
+              console.log("Captura de Pieza");             
+            }
+            else
+            {
+              audioMove.play();
+              onsole.log("Movimiento de Pieza"); 
+            }
+          }
+        }
+      }
+      else
+      {
+        if(newPgn[0] == ' ')
+        {
+          if(newPgn[1] == 'O')
+          {
+            audioCastling.play();
+            console.log("Enroque corto"); 
+          }
+          else
+          {
+            audioMove.play();
+            console.log("Movimiento de Pieza"); 
+          }
+        }
+        //If it's a number or dot, then it´s a peon.
+        else
+        {
+          audioMove.play();
+          console.log("-Es un peon")
+        }
+      }
     }
   }
 
