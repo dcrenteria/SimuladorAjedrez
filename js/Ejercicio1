@@ -1,0 +1,183 @@
+// shufffle function (Fisher-Yates Shuffle)
+function shuffle(array) {
+    var currentIndex = array.length, temporaryValue, randomIndex;
+  
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+  
+      // Pick a remaining element...
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex -= 1;
+  
+      // And swap it with the current element.
+      temporaryValue = array[currentIndex];
+      array[currentIndex] = array[randomIndex];
+      array[randomIndex] = temporaryValue;
+    }
+  
+    return array;
+  }
+
+  //find index of 'e' function
+  function findE(position) {
+      return position == 'e'
+  }
+////////////////////////////////////////////////////////////////////////////////
+
+// define all possible positions
+var positions = 'rnbqkbnrppppppppPPPPPPPPRNBQKBNR'
+for (i = 0, len = 32; i < len; i++) {
+    positions += 'e'
+}
+
+//generate array of all possible fen positions and shuffle
+var positionsArray = positions.split('')
+var fenArray = shuffle(positionsArray)
+
+//remove and replace 'e' w/ num of consecutive e's for FEN notation (empty squares)
+
+while (fenArray.findIndex(findE) != -1) {
+
+    // find first occurence of 'e' and determine number of consecutive Es
+    var firstE = fenArray.findIndex(findE)
+    var numEs = 1
+    for (i = firstE + 1, len = (fenArray.length - (i + 1)); i < len; i++) {
+        if (fenArray[i] == 'e') {
+            numEs += 1
+            i += 1
+        }
+        
+        if (fenArray[i] != 'e') {
+            break
+        }
+    }
+
+    // slice string in two: first string up to firstE, second string ommitting subsequent consecutive e's    
+    var toFirstE = fenArray.slice(0, (firstE + 1)) // ends in e
+    var afterEs = fenArray.slice(firstE + numEs) // does not start with e
+    
+    // replace e in toFirstE w/ num consnecutive e's
+    toFirstE.pop() 
+    toFirstE.push(numEs.toString())
+
+    // redefine fenString as concat of two strings
+    fenArray = toFirstE.concat(afterEs)
+
+}
+
+var fenString = ''
+
+for (i = 0, len = fenArray.length; i < len; i++) {
+    fenString += fenArray[i];
+    if (((i+1) % 8 == 0) && ((i+1) != 64)) { //adds '/' every 8 digiits
+        fenString += '/'
+    }
+
+}
+
+console.log(fenString)
+
+
+
+
+
+
+
+
+
+
+/*code for string version (unfinished)
+//create random position string
+var shuffledPositionsArray = shuffle(positionsArray)
+
+var shuffledPositionsString = ''
+
+for (i = 0, len = shuffledPositionsArray.length; i < len; i++) {
+    shuffledPositionsString += shuffledPositionsArray[i];
+    if (((i+1) % 8 == 0) && ((i+1) != 64)) { //adds '/' every 8 digiits
+        shuffledPositionsString += '/'
+    }
+
+}
+
+
+
+//remove 'e's and replace with # of consecutive 'e's for FEN 
+var fenString = shuffledPositionsString
+
+while (fenString.indexOf('e') != -1) {
+
+    var tracker = 0
+    tracker += 1
+
+    // find first occurence of 'e' and determine number of consecutive Es
+    var firstE = fenString.indexOf('e')
+    var numEs = 1
+    for (i = firstE + 1, len = (fenString.length - (i + 1)); i < len; i++) {
+        if (fenString.charAt(i) == 'e') {
+            numEs += 1
+            i += 1
+        }
+        
+        else {
+            break
+        }
+    }
+
+    // slice string in two: first string up to firstE, second string ommitting subsequent consecutive e's
+    var toFirstE = fenString.slice(0, (firstE + 1)) // ends in e
+    var afterEs = fenString.slice(firstE + numEs - 1) // does not start with e
+
+    toFirstE.replace('e', numEs.toString()) // replace ending e in toFirstE with number of consecutive e's
+
+    // redefine fenString as concat of two strings
+    fenString = toFirstE + afterEs
+
+    
+     var tracker = 12
+    i += 2
+    if (tracker > 64)
+        fenString = 'error'
+        break
+
+}
+
+
+
+debugging:
+
+var shuffledPositionsString = 'eeNePPeq/pPeBePee/eReBePee/beepeeee/neeepeeK/eekePRpp/npberQpP/NeerpePe/'
+var fenString = shuffledPositionsString
+if (fenString.indexOf('e') != -1) {
+
+    // find first occurence of 'e' and determine number of consecutive Es
+    var firstE = fenString.indexOf('e')
+    var numEs = 1
+    for (i = firstE + 1, len = (fenString.length - (i + 1)); i < len; i++) {
+        if (fenString.charAt(i) == 'e') {
+            numEs += 1
+            i += 1
+        }
+        
+        else {
+            break
+        }
+    }
+
+    // slice string in two: first string up to firstE, second string ommitting subsequent consecutive e's
+    var toFirstE = fenString.slice(0, (firstE + 1)) // ends in e
+    var afterEs = fenString.slice(firstE + numEs - 1) // does not start with e
+
+    replacedFirstE = toFirstE.replace('e', numEs.toString()) // replace ending e in toFirstE with number of consecutive e's
+
+    // redefine fenString as concat of two strings
+    fenString = replacedFirstE + afterEs
+
+}
+
+console.log(shuffledPositionsString)
+console.log(numEs)
+console.log(toFirstE)
+console.log(afterEs)
+console.log(replacedFirstE)
+console.log(fenString) */
