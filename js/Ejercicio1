@@ -32,19 +32,34 @@ for (i = 0, len = 32; i < len; i++) {
 
 //generate array of all possible fen positions and shuffle
 var positionsArray = positions.split('')
-var fenArray = shuffle(positionsArray)
+var shuffledPositionsArray = shuffle(positionsArray)
+
+//generate shuffledString with '/'
+var shuffledString = ''
+for (i = 0, len = shuffledPositionsArray.length; i < len; i++) {
+    shuffledString += shuffledPositionsArray[i];
+
+    if (((i+1) % 8 == 0) && ((i+1) != 63)) { //adds '/' every 8 digiits
+        shuffledString += '/'
+    }
+}
+
+// create fenArray
+var fenArray = shuffledString.split('')
 
 //remove and replace 'e' w/ num of consecutive e's for FEN notation (empty squares)
-
 while (fenArray.findIndex(findE) != -1) {
 
+    //find index of 'e' function
+  function findE(position) {
+    return position == 'e'
+}
     // find first occurence of 'e' and determine number of consecutive Es
     var firstE = fenArray.findIndex(findE)
     var numEs = 1
     for (i = firstE + 1, len = (fenArray.length - (i + 1)); i < len; i++) {
         if (fenArray[i] == 'e') {
             numEs += 1
-            i += 1
         }
         
         if (fenArray[i] != 'e') {
@@ -66,15 +81,9 @@ while (fenArray.findIndex(findE) != -1) {
 }
 
 var fenString = ''
-
 for (i = 0, len = fenArray.length; i < len; i++) {
     fenString += fenArray[i];
-    if (((i+1) % 8 == 0) && ((i+1) != 64)) { //adds '/' every 8 digiits
-        fenString += '/'
-    }
-
 }
-
 console.log(fenString)
 
 
